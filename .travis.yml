@@ -17,6 +17,9 @@ script:
   - stack sdist
 after_success:
   - mv -v "$( stack path --local-doc-root )"/aural-* gh-pages
+  - stack exec which aural
+  - echo "$TRAVIS_OS_NAME"
+  - echo "$TRAVIS_BRANCH"
   - cp -v "$( stack exec which aural )" "aural-$TRAVIS_OS_NAME-$TRAVIS_BRANCH"
 deploy:
   - provider: pages
