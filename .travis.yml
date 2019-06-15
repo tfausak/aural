@@ -1,10 +1,10 @@
-language: minimal
+# language: minimal
 os:
   - linux
   - osx
   - windows
-dist: xenial
-osx_image: xcode10.2
+# dist: xenial
+# osx_image: xcode10.2
 cache:
   directories:
     - $HOME/.stack
