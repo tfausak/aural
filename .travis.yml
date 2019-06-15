@@ -3,13 +3,14 @@ os:
   - linux
   - osx
   - windows
+env:
+  - STACK_ROOT=$HOME/.stack
 cache:
   directories:
-    - $HOME/.stack
+    - $STACK_ROOT
     - .stack-work
 install:
   - curl --location https://get.haskellstack.org | sh
-  - stack setup
 script:
-  - stack test
+  - stack build --haddock --test
   - stack sdist
