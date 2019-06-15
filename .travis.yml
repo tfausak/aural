@@ -3,9 +3,12 @@ os:
   - linux
   - osx
   - windows
+dist: xenial
+osx_image: xcode10.2
 cache:
   directories:
     - $HOME/.stack
     - .stack-work
 install:
+  - curl --location https://get.haskellstack.org | sh
   - stack setup
