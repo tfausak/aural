@@ -9,8 +9,19 @@ cache:
   directories:
     - $STACK_ROOT
     - .stack-work
+    - $HOME/AppData/Local/Programs/stack
 install:
   - curl --location https://get.haskellstack.org | sh
 script:
   - stack build --haddock --test
   - stack sdist
+after_success:
+  - mv "$( stack path --local-doc-root )/aural-*" gh-pages
+deploy:
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: gh-pages
+    on:
+      branch: master
+      condition: $TRAVIS_OS_NAME = linux
