@@ -17,13 +17,13 @@ script:
   - stack build --copy-bins --haddock --test
   - stack sdist
 after_success:
-  - mv -v "$( stack path --local-doc-root )"/aural-* gh-pages
+  - mv -v "$( stack path --local-doc-root )"/aural-* "gh-pages-$TRAVIS_BUILD_ID"
   - cp -v "$( stack exec which aural )" "aural-$TRAVIS_OS_NAME-$TRAVIS_BRANCH"
 deploy:
   - provider: pages
     skip_cleanup: true
     github_token: $GITHUB_TOKEN
-    local_dir: gh-pages
+    local_dir: gh-pages-$TRAVIS_BUILD_ID
     on:
       branch: master
       condition: $TRAVIS_OS_NAME = linux
