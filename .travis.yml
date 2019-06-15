@@ -12,6 +12,7 @@ cache:
     - $HOME/AppData/Local/Programs/stack
 install:
   - curl --location https://get.haskellstack.org | sh
+  - stack --version
 script:
   - stack build --copy-bins --haddock --test
   - stack sdist
