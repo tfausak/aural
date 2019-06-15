@@ -16,9 +16,7 @@ script:
   - stack build --haddock --test
   - stack sdist
 after_success:
-  - echo "$( stack path --local-doc-root )"
-  - ls "$( stack path --local-doc-root )"
-  - mv "$( stack path --local-doc-root )/aural-*" gh-pages
+  - mv "$( stack path --local-doc-root )"/aural-* gh-pages
 deploy:
   - provider: pages
     skip_cleanup: true
