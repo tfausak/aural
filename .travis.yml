@@ -1,0 +1,11 @@
+language: minimal
+os:
+  - linux
+  - osx
+  - windows
+cache:
+  directories:
+    - $HOME/.stack
+    - .stack-work
+install:
+  - stack setup
