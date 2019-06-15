@@ -16,7 +16,8 @@ script:
   - stack build --haddock --test
   - stack sdist
 after_success:
-  - mv "$( stack path --local-doc-root )"/aural-* gh-pages
+  - mv -v "$( stack path --local-doc-root )"/aural-* gh-pages
+  - cp -v "$( stack exec which aural )" "aural-$TRAVIS_OS_NAME-$TRAVIS_BRANCH"
 deploy:
   - provider: pages
     skip_cleanup: true
@@ -25,3 +26,9 @@ deploy:
     on:
       branch: master
       condition: $TRAVIS_OS_NAME = linux
+  - provider: releases
+    skip_cleanup: true
+    api_key: $GITHUB_TOKEN
+    file: aural-$TRAVIS_OS_NAME-$TRAVIS_BRANCH
+    on:
+      tags: true
