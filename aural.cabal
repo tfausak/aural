@@ -3,5 +3,12 @@ cabal-version: 2.4
 name: aural
 version: 0.0.0.0
 
+category: Serialization
+description: Aural parses and generates Rocket League replays.
+extra-source-files: README.markdown
+license: ISC
+maintainer: Taylor Fausak
+synopsis: Parse and generate Rocket League replays.
+
 library
   default-language: Haskell2010
