@@ -33,3 +33,12 @@ executable aural
   ghc-options: -rtsopts -threaded
   hs-source-dirs: source/executable
   main-is: Main.hs
+
+test-suite test
+  import: basics
+
+  build-depends: aural
+  ghc-options: -rtsopts -threaded
+  hs-source-dirs: source/test
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
