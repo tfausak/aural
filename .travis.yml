@@ -13,7 +13,9 @@ cache:
 install:
   - curl --location https://get.haskellstack.org | sh
 script:
-  - stack build --haddock --test
+  - stack build
+  - stack test
+  - stack haddock
   - stack sdist
 after_success:
   - mv -v "$( stack path --local-doc-root )"/aural-* gh-pages
