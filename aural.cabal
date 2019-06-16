@@ -19,11 +19,14 @@ common basics
     -Weverything
     -Wno-implicit-prelude
     -Wno-safe
+    -Wno-unsafe
 
 library
   import: basics
 
-  exposed-modules: Aural
+  exposed-modules:
+    Aural
+    Aural.Either
   hs-source-dirs: source/library
 
 executable aural
@@ -37,7 +40,9 @@ executable aural
 test-suite test
   import: basics
 
-  build-depends: aural
+  build-depends:
+    aural,
+    hspec ^>= 2.6.1,
   ghc-options: -rtsopts -threaded
   hs-source-dirs: source/test
   main-is: Main.hs
