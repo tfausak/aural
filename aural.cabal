@@ -28,6 +28,7 @@ library
   exposed-modules:
     Aural
     Aural.Either
+    Aural.Json
     Aural.Utf8
     Aural.Version
   hs-source-dirs: source/library
@@ -44,9 +45,7 @@ executable aural
 test-suite test
   import: basics
 
-  build-depends:
-    aural,
-    hspec ^>= 2.6.1,
+  build-depends: aural, hspec ^>= 2.6.1
   ghc-options: -rtsopts -threaded
   hs-source-dirs: source/test
   main-is: Main.hs

@@ -3,6 +3,7 @@ module Main
   ) where
 
 import qualified Aural.Either
+import qualified Aural.Json
 import qualified Aural.Utf8
 import qualified Aural.Version
 import qualified Data.List
@@ -22,6 +23,71 @@ main = T.hspec . T.describe "Aural" $ do
 
       T.it "with right" $ do
         Aural.Either.unsafeFromRight (Right ()) `T.shouldBe` ()
+
+  T.describe "Json" $ do
+
+    T.describe "decode" $ do
+
+      T.it "is" T.pending
+
+    T.describe "encode" $ do
+
+      T.it "encodes empty input" $ do
+        Aural.Json.encode [] `T.shouldBe` ""
+
+      T.it "encodes null" $ do
+        Aural.Json.encode [Aural.Json.Null] `T.shouldBe` "null"
+
+      T.it "encodes booleans" $ do
+        Aural.Json.encode [Aural.Json.Boolean False] `T.shouldBe` "false"
+        Aural.Json.encode [Aural.Json.Boolean True] `T.shouldBe` "true"
+
+      T.it "encodes numbers" $ do
+        Aural.Json.encode [Aural.Json.Number 0] `T.shouldBe` "0.0"
+        Aural.Json.encode [Aural.Json.Number 1e-9] `T.shouldBe` "0.000000001"
+        Aural.Json.encode [Aural.Json.Number 1e9] `T.shouldBe` "1000000000.0"
+
+      T.it "encodes strings" $ do
+        let
+          convert :: String -> [Aural.Json.Event]
+          convert
+            = (Aural.Json.BeginString :)
+            . foldr (:) [Aural.Json.EndString]
+            . map Aural.Json.Character
+        Aural.Json.encode (convert "") `T.shouldBe` "\"\""
+        Aural.Json.encode (convert "ab") `T.shouldBe` "\"ab\""
+        Aural.Json.encode (convert "\x00") `T.shouldBe` "\"\\u0000\""
+        Aural.Json.encode (convert "\x10348") `T.shouldBe` "\"\x10348\""
+
+      T.it "encodes arrays" $ do
+        let
+          convert :: [Double] -> [Aural.Json.Event]
+          convert
+            = (Aural.Json.BeginArray :)
+            . foldr (:) [Aural.Json.EndArray]
+            . Data.List.intersperse Aural.Json.ValueSeparator
+            . map Aural.Json.Number
+        Aural.Json.encode (convert []) `T.shouldBe` "[]"
+        Aural.Json.encode (convert [1]) `T.shouldBe` "[1.0]"
+        Aural.Json.encode (convert [1, 2]) `T.shouldBe` "[1.0,2.0]"
+
+      T.it "encodes objects" $ do
+        let
+          convert :: [(Char, Double)] -> [Aural.Json.Event]
+          convert
+            = (Aural.Json.BeginObject :)
+            . foldr (:) [Aural.Json.EndObject]
+            . Data.List.intercalate [Aural.Json.ValueSeparator]
+            . map (\ (k, v) ->
+              [ Aural.Json.BeginString
+              , Aural.Json.Character k
+              , Aural.Json.EndString
+              , Aural.Json.NameSeparator
+              , Aural.Json.Number v
+              ])
+        Aural.Json.encode (convert []) `T.shouldBe` "{}"
+        Aural.Json.encode (convert [('a', 1)]) `T.shouldBe` "{\"a\":1.0}"
+        Aural.Json.encode (convert [('a', 1), ('b', 2)]) `T.shouldBe` "{\"a\":1.0,\"b\":2.0}"
 
   T.describe "Utf8" $ do
 
