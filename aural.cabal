@@ -28,6 +28,7 @@ library
   exposed-modules:
     Aural
     Aural.Either
+    Aural.Utf8
     Aural.Version
   hs-source-dirs: source/library
   other-modules: Paths_aural
