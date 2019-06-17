@@ -42,7 +42,17 @@ main = T.hspec . T.describe "Aural" $ do
         Aural.Json.decode "true" `T.shouldBe` [Right $ Aural.Json.Boolean True]
 
       T.it "decodes numbers" $ do
-        T.pending
+        Aural.Json.decode "0" `T.shouldBe` [Right $ Aural.Json.Number 0]
+        Aural.Json.decode "1" `T.shouldBe` [Right $ Aural.Json.Number 1]
+        Aural.Json.decode "-1" `T.shouldBe` [Right . Aural.Json.Number $ -1]
+        Aural.Json.decode "0.0" `T.shouldBe` [Right $ Aural.Json.Number 0]
+        Aural.Json.decode "0.1" `T.shouldBe` [Right $ Aural.Json.Number 0.1]
+        Aural.Json.decode "1e0" `T.shouldBe` [Right $ Aural.Json.Number 1]
+        Aural.Json.decode "1e+0" `T.shouldBe` [Right $ Aural.Json.Number 1]
+        Aural.Json.decode "1E0" `T.shouldBe` [Right $ Aural.Json.Number 1]
+        Aural.Json.decode "1.0e0" `T.shouldBe` [Right $ Aural.Json.Number 1]
+        Aural.Json.decode "1e9" `T.shouldBe` [Right $ Aural.Json.Number 1e9]
+        Aural.Json.decode "1e-9" `T.shouldBe` [Right $ Aural.Json.Number 1e-9]
 
       T.it "decodes strings" $ do
         Aural.Json.decode "\"\"" `T.shouldBe` map Right (jsonString "")
@@ -55,15 +65,13 @@ main = T.hspec . T.describe "Aural" $ do
 
       T.it "decodes arrays" $ do
         Aural.Json.decode "[]" `T.shouldBe` map Right (jsonArray [])
-        T.pending
-        -- Aural.Json.decode "[1]" `T.shouldBe` map Right (jsonArray [1])
-        -- Aural.Json.decode "[1,2]" `T.shouldBe` map Right (jsonArray [1, 2])
+        Aural.Json.decode "[1]" `T.shouldBe` map Right (jsonArray [1])
+        Aural.Json.decode "[1,2]" `T.shouldBe` map Right (jsonArray [1, 2])
 
       T.it "decodes objects" $ do
         Aural.Json.decode "{}" `T.shouldBe` map Right (jsonObject [])
-        T.pending
-        -- Aural.Json.decode "{\"a\":1}" `T.shouldBe` map Right (jsonObject [('a', 1)])
-        -- Aural.Json.decode "{\"a\":1,\"b\":2}" `T.shouldBe` map Right (jsonObject [('a', 1), ('b', 2)])
+        Aural.Json.decode "{\"a\":1}" `T.shouldBe` map Right (jsonObject [('a', 1)])
+        Aural.Json.decode "{\"a\":1,\"b\":2}" `T.shouldBe` map Right (jsonObject [('a', 1), ('b', 2)])
 
     T.describe "encode" $ do
 
