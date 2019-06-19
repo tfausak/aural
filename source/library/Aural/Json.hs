@@ -49,10 +49,44 @@ decodeString string =
   case string of
     "" -> []
     '"' : rest -> Right EndString : decode rest
-    -- TODO: handle escapes
+
+    '\\' : rest -> case rest of
+      '"' : more -> Right (Character '"') : decodeString more
+      '\\' : more -> Right (Character '\\') : decodeString more
+      '/' : more -> Right (Character '/') : decodeString more
+      'b' : more -> Right (Character '\b') : decodeString more
+      'f' : more -> Right (Character '\f') : decodeString more
+      'n' : more -> Right (Character '\n') : decodeString more
+      'r' : more -> Right (Character '\r') : decodeString more
+      't' : more -> Right (Character '\t') : decodeString more
+
+      'u' : a : b : c : d : more -> case fromHex a b c d of
+        Just x -> if 0xd800 <= x && x <= 0xdbff
+          then case more of
+            '\\' : 'u' : e : f : g : h : evenMore -> case fromHex e f g h of
+              Just y -> if 0xdc00 <= y && y <= 0xdfff
+                then Right (Character (Data.Char.chr (fromPair x y))) : decodeString evenMore
+                else Left (Data.Char.chr x) : Right (Character (Data.Char.chr y)) : decodeString evenMore
+              Nothing -> Left (Data.Char.chr x) : map Left ['\\', 'u', e, f, g, h] ++ decodeString evenMore
+            _ -> Left (Data.Char.chr x) : decodeString more
+          else if 0xdc00 <= x && x <= 0xdfff
+            then Left (Data.Char.chr x) : decodeString more
+            else Right (Character (Data.Char.chr x)) : decodeString more
+        Nothing -> map Left ['\\', 'u', a, b, c, d] ++ decodeString more
+
+      "" -> [Left '\\']
+      char : more -> Left '\\' : Left char : decodeString more
+
     char : rest -> if isControl char
       then Left char : decodeString rest
       else Right (Character char) : decodeString rest
+
+fromPair :: Int -> Int -> Int
+fromPair hi lo =
+  0x10000 + (((hi - 0xd800) * 0x0400) + (lo - 0xdc00))
+
+fromHex :: Char -> Char -> Char -> Char -> Maybe Int
+fromHex a b c d = Text.Read.readMaybe ['0', 'x', a, b, c, d]
 
 decodeNumber :: String -> [Either Char Event]
 decodeNumber string = case string of

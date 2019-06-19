@@ -57,11 +57,20 @@ main = T.hspec . T.describe "Aural" $ do
       T.it "decodes strings" $ do
         Aural.Json.decode "\"\"" `T.shouldBe` map Right (jsonString "")
         Aural.Json.decode "\"ab\"" `T.shouldBe` map Right (jsonString "ab")
-        T.pending
-        -- Aural.Json.decode "\"\\u0000\"" `T.shouldBe` map Right (jsonString "\x00")
-        -- Aural.Json.decode "\"\x10348\"" `T.shouldBe` map Right (jsonString "\x10348")
-        -- Aural.Json.decode "\"\\ud834\\udd1e\"" `T.shouldBe` map Right (jsonString "\x1d11e")
-        -- Aural.Json.decode "\"\\\"\\\\\\b\\f\\n\\r\\t\"" `T.shouldBe` map Right (jsonString "\"\\\b\f\n\r\t")
+        Aural.Json.decode "\"\\u0000\"" `T.shouldBe` map Right (jsonString "\x00")
+        Aural.Json.decode "\"\x10348\"" `T.shouldBe` map Right (jsonString "\x10348")
+        Aural.Json.decode "\"\\ud834\\udd1e\"" `T.shouldBe` map Right (jsonString "\x1d11e")
+        Aural.Json.decode "\"\\\"\\\\\\b\\f\\n\\r\\t\"" `T.shouldBe` map Right (jsonString "\"\\\b\f\n\r\t")
+
+      T.it "decodes string edge cases" $ do
+        Aural.Json.decode "\"\x00\"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\x00', Right Aural.Json.EndString]
+        Aural.Json.decode "\"\\" `T.shouldBe` [Right Aural.Json.BeginString, Left '\\']
+        Aural.Json.decode "\"\\\"" `T.shouldBe` [Right Aural.Json.BeginString, Right (Aural.Json.Character '"')]
+        Aural.Json.decode "\"\\ \"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\\', Left ' ', Right Aural.Json.EndString]
+        Aural.Json.decode "\"\\udb00\"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\xdb00', Right Aural.Json.EndString]
+        Aural.Json.decode "\"\\udb00 \"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\xdb00', Right (Aural.Json.Character ' '), Right Aural.Json.EndString]
+        Aural.Json.decode "\"\\udb00\\u002f\"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\xdb00', Right (Aural.Json.Character '/'), Right Aural.Json.EndString]
+        Aural.Json.decode "\"\\udc00\"" `T.shouldBe` [Right Aural.Json.BeginString, Left '\xdc00', Right Aural.Json.EndString]
 
       T.it "decodes arrays" $ do
         Aural.Json.decode "[]" `T.shouldBe` map Right (jsonArray [])
