@@ -27,7 +27,6 @@ library
   autogen-modules: Paths_aural
   exposed-modules:
     Aural
-    Aural.Either
     Aural.Json
     Aural.Utf8
     Aural.Version
