@@ -5,6 +5,7 @@ module Main
 import qualified Aural.Json
 import qualified Aural.Utf8
 import qualified Aural.Version
+import qualified Control.Monad
 import qualified Data.List
 import qualified Data.Version
 import qualified Test.Hspec as T
@@ -13,6 +14,11 @@ main :: IO ()
 main = T.hspec . T.describe "Aural" $ do
 
   T.describe "Json" $ do
+
+    T.it "round trips every character" $ do
+      Control.Monad.forM_ [ minBound .. maxBound ] $ \ char -> do
+        let xs = jsonString [char]
+        Aural.Json.decode (Aural.Json.encode xs) `T.shouldBe` map Right xs
 
     T.describe "decode" $ do
 
@@ -91,7 +97,6 @@ main = T.hspec . T.describe "Aural" $ do
         Aural.Json.encode [Aural.Json.Number (-1 / 0)] `T.shouldBe` "null"
 
       T.it "encodes strings" $ do
-        let
         Aural.Json.encode (jsonString "") `T.shouldBe` "\"\""
         Aural.Json.encode (jsonString "ab") `T.shouldBe` "\"ab\""
         Aural.Json.encode (jsonString "\x00") `T.shouldBe` "\"\\u0000\""
@@ -109,6 +114,11 @@ main = T.hspec . T.describe "Aural" $ do
         Aural.Json.encode (jsonObject [('a', 1), ('b', 2)]) `T.shouldBe` "{\"a\":1.0,\"b\":2.0}"
 
   T.describe "Utf8" $ do
+
+    T.it "round trips every character" $ do
+      Control.Monad.forM_ [ minBound .. maxBound ] $ \ char -> do
+        let xs = [char]
+        Aural.Utf8.decode (Aural.Utf8.encode xs) `T.shouldBe` map Right xs
 
     T.describe "decode" $ do
 
@@ -130,19 +140,19 @@ main = T.hspec . T.describe "Aural" $ do
     T.describe "encode" $ do
 
       T.it "encodes empty input" $ do
-        Aural.Utf8.encode [] `T.shouldBe` []
+        Aural.Utf8.encode "" `T.shouldBe` []
 
       T.it "encodes one byte" $ do
-        Aural.Utf8.encode ['\x24'] `T.shouldBe` [0x24]
+        Aural.Utf8.encode "\x24" `T.shouldBe` [0x24]
 
       T.it "encodes two bytes" $ do
-        Aural.Utf8.encode ['\xa2'] `T.shouldBe` [0xc2, 0xa2]
+        Aural.Utf8.encode "\xa2" `T.shouldBe` [0xc2, 0xa2]
 
       T.it "encodes three bytes" $ do
-        Aural.Utf8.encode ['\x20ac'] `T.shouldBe` [0xe2, 0x82, 0xac]
+        Aural.Utf8.encode "\x20ac" `T.shouldBe` [0xe2, 0x82, 0xac]
 
       T.it "encodes four bytes" $ do
-        Aural.Utf8.encode ['\x10348'] `T.shouldBe` [0xf0, 0x90, 0x8d, 0x88]
+        Aural.Utf8.encode "\x10348" `T.shouldBe` [0xf0, 0x90, 0x8d, 0x88]
 
   T.describe "Version" $ do
 

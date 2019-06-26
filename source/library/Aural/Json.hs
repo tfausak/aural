@@ -160,7 +160,7 @@ encodeEvent event =
       '\r' -> "\\r"
       '\t' -> "\\t"
       _ -> if isControl character
-        then Text.Printf.printf "\\u%04d" $ Data.Char.ord character
+        then Text.Printf.printf "\\u%04x" $ Data.Char.ord character
         else [character]
     EndString -> "\""
     BeginArray -> "["
