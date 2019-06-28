@@ -1,6 +1,8 @@
 -- | Aural parses and generates Rocket League replays.
 module Aural
-  ( Aural.Version.version
+  ( Aural.Main.defaultMain
+  , Aural.Version.version
   ) where
 
+import qualified Aural.Main
 import qualified Aural.Version

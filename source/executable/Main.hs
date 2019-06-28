@@ -2,7 +2,7 @@ module Main
   ( main
   ) where
 
-import Aural ()
+import qualified Aural
 
 main :: IO ()
-main = pure ()
+main = Aural.defaultMain
