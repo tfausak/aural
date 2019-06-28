@@ -88,6 +88,7 @@ fromPair hi lo =
 fromHex :: Char -> Char -> Char -> Char -> Maybe Int
 fromHex a b c d = Text.Read.readMaybe ['0', 'x', a, b, c, d]
 
+-- TODO: Decoding numbers (doubleP) is very slow.
 decodeNumber :: String -> [Either Char Event]
 decodeNumber string = case string of
   "" -> []
@@ -146,22 +147,10 @@ encodeEvent :: Event -> String
 encodeEvent event =
   case event of
     Null -> "null"
-    Boolean boolean -> if boolean then "true" else "false"
-    Number number -> if isNaN number || isInfinite number
-      then "null"
-      else Text.Printf.printf "%f" number
+    Boolean boolean -> encodeBoolean boolean
+    Number number -> encodeNumber number
     BeginString -> "\""
-    Character character -> case character of
-      '"' -> "\\\""
-      '\\' -> "\\\\"
-      '\b' -> "\\b"
-      '\f' -> "\\f"
-      '\n' -> "\\n"
-      '\r' -> "\\r"
-      '\t' -> "\\t"
-      _ -> if isControl character
-        then Text.Printf.printf "\\u%04x" $ Data.Char.ord character
-        else [character]
+    Character character -> encodeCharacter character
     EndString -> "\""
     BeginArray -> "["
     ValueSeparator -> ","
@@ -169,6 +158,28 @@ encodeEvent event =
     BeginObject -> "{"
     NameSeparator -> ":"
     EndObject -> "}"
+
+encodeBoolean :: Bool -> String
+encodeBoolean boolean = if boolean then "true" else "false"
+
+-- TODO: Encoding numbers is very slow.
+encodeNumber :: Double -> String
+encodeNumber number = if isNaN number || isInfinite number
+  then "null"
+  else Text.Printf.printf "%f" number
+
+encodeCharacter :: Char -> String
+encodeCharacter character = case character of
+  '"' -> "\\\""
+  '\\' -> "\\\\"
+  '\b' -> "\\b"
+  '\f' -> "\\f"
+  '\n' -> "\\n"
+  '\r' -> "\\r"
+  '\t' -> "\\t"
+  _ -> if isControl character
+    then Text.Printf.printf "\\u%04x" $ Data.Char.ord character
+    else [character]
 
 isControl :: Char -> Bool
 isControl = (<= '\x1f')
